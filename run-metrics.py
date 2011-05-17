@@ -19,6 +19,7 @@ M_RB_LOC = 'SLOCrb'
 M_CONF_LOC = 'SLOCconf'
 M_PROTO_LOC = 'SLOCproto'
 M_WEB_LOC = 'SLOCweb'
+M_JS_LOC = 'SLOCjs'
 
 MT_SLOC = "SLOC"
 MT_SLOCN = "SLOCbyname"
@@ -74,6 +75,7 @@ PACKS = [
     ['../ooici-pres','.', ['ION','COI','COI-cc'], [M_JA_LOC, M_GROOVY_LOC]],
     ['../ooici-pres','src/java', ['-COI-cc','COI-idm'], [M_JA_LOC, M_GROOVY_LOC]],
     ['../ooici-pres','.', ['ION','UI'], [M_WEB_LOC]],
+    ['../ooici-pres','web-app/js/ooici*', ['ION','UI'], [M_JS_LOC]],
 
     ['../epu','epu', ['ION','CEI','CEI-ela'], [M_PY_LOC]],
 
@@ -256,6 +258,12 @@ def measure_package(metrics, pack):
             add_to_metrics(metrics, p_pack, MT_SLOC, counter, M_WEB_LOC, count)
         count_by_name(metrics, pack, ['gsp','html'], M_PY_LOC)
 
+    if M_JS_LOC in p_metricprocs:
+        cmd = "find %s/%s -name '*.js' -prune | xargs cat | sed '/^\s*\/\//d;/^\s*$/d' | wc -l" % (p_path, p_pack)
+        count = int(os.popen(cmd).read())
+        for counter in p_counters:
+            add_to_metrics(metrics, p_pack, MT_SLOC, counter, M_JS_LOC, count)
+        count_by_name(metrics, pack, ['js'], M_PY_LOC)
 
 def write_csv(metrics, unique):
     outfile = open('results/code-metrics_%s.csv' % unique,'w')
