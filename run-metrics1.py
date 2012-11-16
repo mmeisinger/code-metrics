@@ -26,78 +26,50 @@ MT_SLOCN = "SLOCbyname"
 MT_SLOCNT = "SLOCbynametype"
 
 PACKS = [
-    ['../ioncore-python','ion', ['ION'], [M_PY_LOC]],
-    ['../ioncore-python','ion/agents', ['IPA'], [M_PY_LOC]],
-    ['../ioncore-python','ion/core', ['COI','COI-cc'], [M_PY_LOC]],
-    ['../ioncore-python','ion/core/data', ['DM','DM-pres','-COI','-COI-cc'], [M_PY_LOC]],
-    ['../ioncore-python','ion/core/object', ['DM','DM-mod','-COI','-COI-cc'], [M_PY_LOC]],
-    ['../ioncore-python','ion/core/security', ['COI-idm','-COI-cc'], [M_PY_LOC]],
-    ['../ioncore-python','ion/demo', ['ITV','ITV-ais'], [M_PY_LOC]],
-    ['../ioncore-python','ion/integration/ais', ['ITV','ITV-ais'], [M_PY_LOC]],
-    ['../ioncore-python','ion/integration/eoi', ['EOI'], [M_PY_LOC]],
-    ['../ioncore-python','ion/integration/sa', ['SA'], [M_PY_LOC]],
-    ['../ioncore-python','ion/interact', ['COI','COI-gov'], [M_PY_LOC]],
-    ['../ioncore-python','ion/play', ['COI','COI-cc'], [M_PY_LOC]],
-    ['../ioncore-python','ion/services/coi', ['COI','COI-cc'], [M_PY_LOC]],
-    ['../ioncore-python','ion/services/coi/identity*', ['COI-idm','-COI-cc'], [M_PY_LOC]],
-    ['../ioncore-python','ion/services/coi/resource*', ['COI-res','-COI-cc'], [M_PY_LOC]],
-    ['../ioncore-python','ion/services/dm', ['DM','DM-dd'], [M_PY_LOC]],
-    ['../ioncore-python','ion/services/dm/ingestion', ['DM-cat','-DM-dd'], [M_PY_LOC]],
-    ['../ioncore-python','ion/services/dm/inventory', ['DM-cat','-DM-dd'], [M_PY_LOC]],
-    ['../ioncore-python','ion/services/dm/presentation', ['DM-cat','-DM-dd'], [M_PY_LOC]],
-    ['../ioncore-python','ion/services/dm/preservation', ['DM-pres','-DM-dd'], [M_PY_LOC]],
-    ['../ioncore-python','ion/services/sa', ['SA','SA-man'], [M_PY_LOC]],
-    ['../ioncore-python','ion/test', ['COI','COI-cc'], [M_PY_LOC]],
-    ['../ioncore-python','ion/util', ['COI','COI-cc'], [M_PY_LOC]],
-    ['../ioncore-python','ion/vandv', ['ION','ITV'], [M_PY_LOC]],
-    ['../ioncore-python','ion/ops', ['ION','ITV'], [M_PY_LOC]],
-    ['../ioncore-python','ion/zapps', ['COI','COI-cc'], [M_PY_LOC]],
-    ['../ioncore-python','res', ['ION','ITV'], [M_CONF_LOC]],
-    ['../ioncore-python','res/amqp', ['-ION','-ITV'], [M_CONF_LOC]],
-    ['../ioncore-python','twisted', ['COI','COI-cc'], [M_PY_LOC]],
+    ['../pyon','pyon', ['ION', 'pyon'], [M_PY_LOC]],
+    ['../pyon','examples', ['ION', 'pyon'], [M_PY_LOC]],
+    ['../pyon','prototype', ['ION', 'pyon'], [M_PY_LOC]],
+    ['../pyon','putil', ['ION', 'pyon'], [M_PY_LOC]],
+    ['../pyon','scripts', ['ION', 'pyon'], [M_PY_LOC]],
 
-    ['../ioncore-java','src', ['ION','COI','COI-cc'], [M_JA_LOC]],
+    ['../coi-services','ion', ['ION', 'services'], [M_PY_LOC]],
+    #['../coi-services','examples', ['ION'], [M_PY_LOC]],
 
-    ['../ion-object-definitions','python', ['ION','DM','DM-mod'], [M_PY_LOC]],
-    ['../ion-object-definitions','net/ooici/cdm', ['ION','DM','DM-mod'], [M_PROTO_LOC]],
-    ['../ion-object-definitions','net/ooici/core', ['ION','DM','DM-mod'], [M_PROTO_LOC]],
-    ['../ion-object-definitions','net/ooici/integration/ais', ['ION','ITV','ITV-ais'], [M_PROTO_LOC]],
-    ['../ion-object-definitions','net/ooici/integration/eoi', ['ION','EOI'], [M_PROTO_LOC]],
-    ['../ion-object-definitions','net/ooici/play', ['ION','DM','DM-mod'], [M_PROTO_LOC]],
-    ['../ion-object-definitions','net/ooici/services/coi', ['ION','COI','COI-cc'], [M_PROTO_LOC]],
-    ['../ion-object-definitions','net/ooici/services/dm', ['ION','DM','DM-dd'], [M_PROTO_LOC]],
-    ['../ion-object-definitions','net/ooici/services/sa', ['ION','SA','SA-reg'], [M_PROTO_LOC]],
-    ['../ion-object-definitions','net/ooici/test', ['ION','DM','DM-mod'], [M_PROTO_LOC]],
+    ['../coi-services','extern/ion-definitions/objects', ['ION'], [M_CONF_LOC]],
 
-    ['../ion-integration','ionint', ['ION','ITV','ITV-test'], [M_PY_LOC]],
-    ['../ion-integration','inttests', ['ION','ITV','ITV-test'], [M_PY_LOC]],
-    ['../ion-integration','itv_trial', ['ION','ITV','ITV-code'], [M_PY_LOC]],
-    ['../ion-integration','src', ['ION','ITV','ITV-test'], [M_JA_LOC]],
-    ['../ion-integration','tests', ['ION','ITV','ITV-test'], [M_PY_LOC]],
+    ['../ion-ux','main.py', ['ION','UX'], [M_PY_LOC]],
+    ['../ion-ux','service_api.py', ['ION','UX'], [M_PY_LOC]],
+    ['../ion-ux','layout_api.py', ['ION','UX'], [M_PY_LOC]],
+    ['../ion-ux','templates', ['ION','UX'], [M_WEB_LOC, M_JS_LOC]],
+    # TODO: in static/js select files
 
-    ['../ooici-pres','.', ['ION','COI','COI-cc'], [M_JA_LOC, M_GROOVY_LOC]],
-    ['../ooici-pres','src/java', ['-COI-cc','COI-idm'], [M_JA_LOC, M_GROOVY_LOC]],
-    ['../ooici-pres','.', ['ION','UI'], [M_WEB_LOC]],
-    ['../ooici-pres','web-app/js/ooici*', ['ION','UI'], [M_JS_LOC]],
+    ['../coverage-model','coverage_model', ['ION'], [M_PY_LOC]],
 
-    ['../epu','epu', ['ION','CEI','CEI-ela'], [M_PY_LOC]],
+    ['../marine-integrations','mi', ['ION', 'MI'], [M_PY_LOC]],
 
-    ['../epuagent','epuagent', ['ION','CEI','CEI-ee'], [M_PY_LOC]],
+    ['../port_agent','tools', ['ION', 'MI'], [M_PY_LOC]],
+    # TODO: C code in port_agent
 
-    ['../eoi-agents','src', ['ION','EOI'], [M_JA_LOC]],
+    ['../utilities','src', ['ION', 'int'], [M_PY_LOC]],
+    ['../utilities','test', ['ION', 'int'], [M_PY_LOC]],
 
-    ['../dt-data','.', ['ION','CEI','CEI-ee','CEI-conf'], [M_RB_LOC, M_CONF_LOC]],
+    ['../ape','.', ['ION', 'int'], [M_PY_LOC]],
 
-    ['../launch-plans','.', ['ION','CEI','CEI-ee','CEI-conf'], [M_RB_LOC, M_CONF_LOC]],
+    ['../epu','epu', ['ION','cei'], [M_PY_LOC]],
 
-    ['../txrabbitmq','.', ['ION','CEI','CEI-ela'], [M_PY_LOC]],
+    ['../dt-data','.', ['ION','cei'], [M_RB_LOC, M_CONF_LOC]],
 
-    ['../cloudinit.d','.', ['ION','CEI','CEI-ee'], [M_PY_LOC, M_CONF_LOC]],
+    ['../launch-plans','.', ['ION','cei'], [M_RB_LOC, M_CONF_LOC]],
 
-    ['../epumgmt','.', ['ION','CEI','CEI-ee'], [M_PY_LOC, M_CONF_LOC]],
+    ['../cloudinit.d','.', ['ION','cei'], [M_PY_LOC, M_CONF_LOC]],
 
-    ['../Nimboss','.', ['ION','CEI','CEI-ee'], [M_PY_LOC, M_CONF_LOC]],
+    ['../pidantic','pidantic', ['ION','cei'], [M_PY_LOC]],
 
+    ['../eeagent','.', ['ION','cei'], [M_PY_LOC]],
+
+    ['../epuharness','.', ['ION','cei'], [M_PY_LOC, M_CONF_LOC]],
+
+    ['../epumgmt','src', ['ION','cei'], [M_PY_LOC, M_CONF_LOC]],
 ]
 
 ALIASES = {
@@ -109,6 +81,9 @@ ALIASES = {
     'brianfox':'Brian Fox',
     'oldpatricka':'Patrick Armstrong',
     'unwin':'Roger Unwin',
+    'ijk5':'Ian Katz',
+    'seman':'Seman Said',
+    'rumi':'Rumi Neykova',
 }
 
 def add_to_metrics(metrics, package, mtype, counter, metric, count):
@@ -241,9 +216,11 @@ def measure_package(metrics, pack):
         count += int(os.popen(cmd).read())
         cmd = "find %s/%s -name '*.json' -prune | xargs cat | sed '/^\s*\/\//d;/^\s*$/d' | wc -l" % (p_path, p_pack)
         count += int(os.popen(cmd).read())
+        cmd = "find %s/%s -name '*.yml' -prune | xargs cat | sed '/^\s*#/d;/^\s*$/d' | wc -l" % (p_path, p_pack)
+        count += int(os.popen(cmd).read())
         for counter in p_counters:
             add_to_metrics(metrics, p_pack, MT_SLOC, counter, M_CONF_LOC, count)
-        count_by_name(metrics, pack, ['conf','app','rel','properties','xml','sh','json'], M_PY_LOC)
+        count_by_name(metrics, pack, ['conf','app','rel','properties','xml','sh','json','yml'], M_PY_LOC)
 
     if M_PROTO_LOC in p_metricprocs:
         cmd = "find %s/%s -name '*.proto' -prune | xargs cat | sed '/^\s*\/\//d;/^\s*$/d' | wc -l" % (p_path, p_pack)
