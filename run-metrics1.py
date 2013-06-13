@@ -8,7 +8,7 @@
 import os, subprocess, sys, string, pprint, re
 
 GIT_PULL = False
-BY_NAME = True
+BY_NAME = False
 
 RESULTS_DIR = "results"
 
@@ -20,22 +20,37 @@ M_CONF_LOC = 'SLOCconf'
 M_PROTO_LOC = 'SLOCproto'
 M_WEB_LOC = 'SLOCweb'
 M_JS_LOC = 'SLOCjs'
+M_C_LOC = 'SLOCc'
 
 MT_SLOC = "SLOC"
 MT_SLOCN = "SLOCbyname"
 MT_SLOCNT = "SLOCbynametype"
 
 PACKS = [
-    ['../pyon','pyon', ['ION', 'pyon'], [M_PY_LOC]],
-    ['../pyon','examples', ['ION', 'pyon'], [M_PY_LOC]],
-    ['../pyon','prototype', ['ION', 'pyon'], [M_PY_LOC]],
-    ['../pyon','putil', ['ION', 'pyon'], [M_PY_LOC]],
-    ['../pyon','scripts', ['ION', 'pyon'], [M_PY_LOC]],
+    ['../pyon','pyon', ['ION', 'pyon', 'COI'], [M_PY_LOC]],
+    ['../pyon','examples', ['ION', 'pyon', 'INT'], [M_PY_LOC]],
+    ['../pyon','prototype', ['ION', 'pyon', 'INT'], [M_PY_LOC]],
+    ['../pyon','putil', ['ION', 'pyon', 'INT'], [M_PY_LOC]],
+    ['../pyon','scripts', ['ION', 'pyon', 'INT'], [M_PY_LOC]],
 
     ['../coi-services','ion', ['ION', 'services'], [M_PY_LOC]],
-    #['../coi-services','examples', ['ION'], [M_PY_LOC]],
+    ['../coi-services','ion/agents', ['SA'], [M_PY_LOC]],
+    ['../coi-services','ion/agents/cei', ['-SA', 'CEI'], [M_PY_LOC]],
+    ['../coi-services','ion/agents/data', ['-SA', 'EOI'], [M_PY_LOC]],
+    ['../coi-services','ion/core', ['COI'], [M_PY_LOC]],
+    ['../coi-services','ion/processes', ['DM'], [M_PY_LOC]],
+    ['../coi-services','ion/processes/bootstrap', ['-DM', 'COI'], [M_PY_LOC]],
+    ['../coi-services','ion/processes/data/transforms/viz', ['-DM', 'AS'], [M_PY_LOC]],
+    ['../coi-services','ion/services/ANS', ['AS'], [M_PY_LOC]],
+    ['../coi-services','ion/services/coi', ['COI'], [M_PY_LOC]],
+    ['../coi-services','ion/services/dm', ['DM'], [M_PY_LOC]],
+    ['../coi-services','ion/services/sa', ['SA'], [M_PY_LOC]],
+    ['../coi-services','ion/services/cei', ['CEI'], [M_PY_LOC]],
+    ['../coi-services','ion/services/eoi', ['EOI'], [M_PY_LOC]],
+    ['../coi-services','ion/simulators', ['MI'], [M_PY_LOC]],
+    ['../coi-services','ion/util', ['COI'], [M_PY_LOC]],
 
-    ['../coi-services','extern/ion-definitions/objects', ['ION'], [M_CONF_LOC]],
+    ['../coi-services','extern/ion-definitions/objects', ['ION', 'ARCH'], [M_CONF_LOC]],
 
     ['../ion-ux','main.py', ['ION','UX'], [M_PY_LOC]],
     ['../ion-ux','service_api.py', ['ION','UX'], [M_PY_LOC]],
@@ -43,33 +58,33 @@ PACKS = [
     ['../ion-ux','templates', ['ION','UX'], [M_WEB_LOC, M_JS_LOC]],
     # TODO: in static/js select files
 
-    ['../coverage-model','coverage_model', ['ION'], [M_PY_LOC]],
+    ['../coverage-model','coverage_model', ['ION', 'DM'], [M_PY_LOC]],
 
     ['../marine-integrations','mi', ['ION', 'MI'], [M_PY_LOC]],
 
     ['../port_agent','tools', ['ION', 'MI'], [M_PY_LOC]],
-    # TODO: C code in port_agent
+    ['../port_agent','src', ['ION', 'MI'], [M_C_LOC]],
 
-    ['../utilities','src', ['ION', 'int'], [M_PY_LOC]],
-    ['../utilities','test', ['ION', 'int'], [M_PY_LOC]],
+    ['../utilities','src', ['ION', 'INT'], [M_PY_LOC]],
+    ['../utilities','test', ['ION', 'INT'], [M_PY_LOC]],
 
-    ['../ape','.', ['ION', 'int'], [M_PY_LOC]],
+    ['../ape','.', ['ION', 'INT'], [M_PY_LOC]],
 
-    ['../epu','epu', ['ION','cei'], [M_PY_LOC]],
+    ['../epu','epu', ['ION','CEI'], [M_PY_LOC]],
 
-    ['../dt-data','.', ['ION','cei'], [M_RB_LOC, M_CONF_LOC]],
+    ['../dt-data','.', ['ION','INT'], [M_RB_LOC, M_CONF_LOC]],
 
-    ['../launch-plans','.', ['ION','cei'], [M_RB_LOC, M_CONF_LOC]],
+    ['../launch-plans','.', ['ION','INT'], [M_RB_LOC, M_CONF_LOC]],
 
-    ['../cloudinit.d','.', ['ION','cei'], [M_PY_LOC, M_CONF_LOC]],
+    ['../cloudinit.d','.', ['ION','CEI'], [M_PY_LOC, M_CONF_LOC]],
 
-    ['../pidantic','pidantic', ['ION','cei'], [M_PY_LOC]],
+    ['../pidantic','pidantic', ['ION','CEI'], [M_PY_LOC]],
 
-    ['../eeagent','.', ['ION','cei'], [M_PY_LOC]],
+    ['../eeagent','.', ['ION','CEI'], [M_PY_LOC]],
 
-    ['../epuharness','.', ['ION','cei'], [M_PY_LOC, M_CONF_LOC]],
+    ['../epuharness','.', ['ION','CEI'], [M_PY_LOC, M_CONF_LOC]],
 
-    ['../epumgmt','src', ['ION','cei'], [M_PY_LOC, M_CONF_LOC]],
+    ['../epumgmt','src', ['ION','CEI'], [M_PY_LOC, M_CONF_LOC]],
 ]
 
 ALIASES = {
@@ -184,6 +199,15 @@ def measure_package(metrics, pack):
         for counter in p_counters:
             add_to_metrics(metrics, p_pack, MT_SLOC, counter, M_JA_LOC, count)
         count_by_name(metrics, pack, ['java'], M_PY_LOC)
+
+    if M_C_LOC in p_metricprocs:
+        cmd = "find %s/%s -name '*.cxx' -prune | xargs cat | sed '/^\s*\/\//d;/^\s*\/\*/d;/^\s*$/d' | wc -l" % (p_path, p_pack)
+        count = int(os.popen(cmd).read())
+        cmd = "find %s/%s -name '*.h' -prune | xargs cat | sed '/^\s*\/\//d;/^\s*\/\*/d;/^\s*$/d' | wc -l" % (p_path, p_pack)
+        count += int(os.popen(cmd).read())
+        for counter in p_counters:
+            add_to_metrics(metrics, p_pack, MT_SLOC, counter, M_C_LOC, count)
+        count_by_name(metrics, pack, ['cxx','h'], M_C_LOC)
 
     if M_GROOVY_LOC in p_metricprocs:
         cmd = "find %s/%s -name '*.groovy' -prune | xargs cat | sed '/^\s*\/\//d;/^\s*$/d' | wc -l" % (p_path, p_pack)
