@@ -5,10 +5,11 @@
 @author Michael Meisinger
 @brief Collect some code metrics
 """
+
 import os, subprocess, sys, string, pprint, re
 
 GIT_PULL = False
-BY_NAME = False
+BY_NAME = True
 
 RESULTS_DIR = "results"
 
@@ -56,7 +57,9 @@ PACKS = [
     ['../ion-ux','service_api.py', ['ION','UX'], [M_PY_LOC]],
     ['../ion-ux','layout_api.py', ['ION','UX'], [M_PY_LOC]],
     ['../ion-ux','templates', ['ION','UX'], [M_WEB_LOC, M_JS_LOC]],
-    # TODO: in static/js select files
+    ['../ion-ux','static/js/ux-*', ['ION','UX'], [M_JS_LOC]],
+    ['../ion-ux','static/js/ion-*', ['ION','UX'], [M_JS_LOC]],
+    ['../ion-ux','static/js/IONUX*', ['ION','UX'], [M_JS_LOC]],
 
     ['../coverage-model','coverage_model', ['ION', 'DM'], [M_PY_LOC]],
 
@@ -80,6 +83,8 @@ PACKS = [
 
     ['../pidantic','pidantic', ['ION','CEI'], [M_PY_LOC]],
 
+    ['../ceiclient','ceiclient', ['ION','CEI'], [M_PY_LOC]],
+
     ['../eeagent','.', ['ION','CEI'], [M_PY_LOC]],
 
     ['../epuharness','.', ['ION','CEI'], [M_PY_LOC, M_CONF_LOC]],
@@ -99,11 +104,21 @@ ALIASES = {
     'ijk5':'Ian Katz',
     'seman':'Seman Said',
     'rumi':'Rumi Neykova',
+    'Rumyana Neykova':'Rumi Neykova',
+    'wfrench':'Bill French',
+    'Jeff Laughlin Consulting LLC':'Jeff Laughlin',
+    'jlaughlin':'Jeff Laughlin',
+
 }
 
-def add_to_metrics(metrics, package, mtype, counter, metric, count):
+def add_to_metrics(metrics, package, sdir, mtype, counter, metric, count):
+    if package.startswith("../"):
+        package = package[3:]
 
-    print "Package:%s counter:%s metric:%s count=%s" % (package, counter, metric, count)
+    if counter.startswith("-"):
+        print "  %s: %s %s[%s] MINUS %s" % (package, sdir, counter[1:], metric, count)
+    else:
+        print "  %s: %s %s[%s] PLUS %s" % (package, sdir, counter, metric, count)
 
     if not mtype in metrics:
         metrics[mtype] = {}
@@ -177,8 +192,8 @@ def count_by_name(metrics, pack, extensions, metric):
             xname = ALIASES.get(name, name)
 
             for counter in p_counters:
-                add_to_metrics(metrics, p_pack, MT_SLOCN, counter, xname, count)
-                add_to_metrics(metrics, p_pack, MT_SLOCNT, counter, "%s:%s" % (ext,xname), count)
+                add_to_metrics(metrics, p_path, p_pack, MT_SLOCN, counter, xname, count)
+                add_to_metrics(metrics, p_path, p_pack, MT_SLOCNT, counter, "%s:%s" % (ext,xname), count)
 
         cmd = "rm namecount.tmp"
         res = os.popen(cmd).read()
@@ -187,88 +202,88 @@ def measure_package(metrics, pack):
     p_path, p_pack, p_counters, p_metricprocs = pack
 
     if M_PY_LOC in p_metricprocs:
-        cmd = "find %s/%s -name '*.py' -prune | xargs cat | sed '/^\s*#/d;/^\s*$/d' | wc -l" % (p_path, p_pack)
+        cmd = "find %s/%s -name '*.py' -prune -print0 | xargs -0 cat | sed '/^\s*#/d;/^\s*$/d' | wc -l" % (p_path, p_pack)
         count = int(os.popen(cmd).read())
         for counter in p_counters:
-            add_to_metrics(metrics, p_pack, MT_SLOC, counter, M_PY_LOC, count)
+            add_to_metrics(metrics, p_path, p_pack, MT_SLOC, counter, M_PY_LOC, count)
         count_by_name(metrics, pack, ['py'], M_PY_LOC)
 
     if M_JA_LOC in p_metricprocs:
-        cmd = "find %s/%s -name '*.java' -prune | xargs cat | sed '/^\s*\/\//d;/^\s*$/d' | wc -l" % (p_path, p_pack)
+        cmd = "find %s/%s -name '*.java' -prune -print0 | xargs -0 cat | sed '/^\s*\/\//d;/^\s*$/d' | wc -l" % (p_path, p_pack)
         count = int(os.popen(cmd).read())
         for counter in p_counters:
-            add_to_metrics(metrics, p_pack, MT_SLOC, counter, M_JA_LOC, count)
+            add_to_metrics(metrics, p_path, p_pack, MT_SLOC, counter, M_JA_LOC, count)
         count_by_name(metrics, pack, ['java'], M_PY_LOC)
 
     if M_C_LOC in p_metricprocs:
-        cmd = "find %s/%s -name '*.cxx' -prune | xargs cat | sed '/^\s*\/\//d;/^\s*\/\*/d;/^\s*$/d' | wc -l" % (p_path, p_pack)
+        cmd = "find %s/%s -name '*.cxx' -prune -print0 | xargs -0 cat | sed '/^\s*\/\//d;/^\s*\/\*/d;/^\s*$/d' | wc -l" % (p_path, p_pack)
         count = int(os.popen(cmd).read())
-        cmd = "find %s/%s -name '*.h' -prune | xargs cat | sed '/^\s*\/\//d;/^\s*\/\*/d;/^\s*$/d' | wc -l" % (p_path, p_pack)
+        cmd = "find %s/%s -name '*.h' -prune -print0 | xargs -0 cat | sed '/^\s*\/\//d;/^\s*\/\*/d;/^\s*$/d' | wc -l" % (p_path, p_pack)
         count += int(os.popen(cmd).read())
         for counter in p_counters:
-            add_to_metrics(metrics, p_pack, MT_SLOC, counter, M_C_LOC, count)
+            add_to_metrics(metrics, p_path, p_pack, MT_SLOC, counter, M_C_LOC, count)
         count_by_name(metrics, pack, ['cxx','h'], M_C_LOC)
 
     if M_GROOVY_LOC in p_metricprocs:
-        cmd = "find %s/%s -name '*.groovy' -prune | xargs cat | sed '/^\s*\/\//d;/^\s*$/d' | wc -l" % (p_path, p_pack)
+        cmd = "find %s/%s -name '*.groovy' -prune -print0 | xargs -0 cat | sed '/^\s*\/\//d;/^\s*$/d' | wc -l" % (p_path, p_pack)
         count = int(os.popen(cmd).read())
         for counter in p_counters:
-            add_to_metrics(metrics, p_pack, MT_SLOC, counter, M_GROOVY_LOC, count)
+            add_to_metrics(metrics, p_path, p_pack, MT_SLOC, counter, M_GROOVY_LOC, count)
         count_by_name(metrics, pack, ['groovy'], M_PY_LOC)
 
     if M_RB_LOC in p_metricprocs:
-        cmd = "find %s/%s -name '*.rb' -prune | xargs cat | sed '/^\s*#/d;/^\s*$/d' | wc -l" % (p_path, p_pack)
+        cmd = "find %s/%s -name '*.rb' -prune -print0 | xargs -0 cat | sed '/^\s*#/d;/^\s*$/d' | wc -l" % (p_path, p_pack)
         count = int(os.popen(cmd).read())
-        cmd = "find %s/%s -name '*.erb' -prune | xargs cat | sed '/^\s*#/d;/^\s*$/d' | wc -l" % (p_path, p_pack)
+        cmd = "find %s/%s -name '*.erb' -prune -print0 | xargs -0 cat | sed '/^\s*#/d;/^\s*$/d' | wc -l" % (p_path, p_pack)
         count += int(os.popen(cmd).read())
         for counter in p_counters:
-            add_to_metrics(metrics, p_pack, MT_SLOC, counter, M_RB_LOC, count)
+            add_to_metrics(metrics, p_path, p_pack, MT_SLOC, counter, M_RB_LOC, count)
         count_by_name(metrics, pack, ['rb','erb'], M_PY_LOC)
 
     if M_CONF_LOC in p_metricprocs:
-        cmd = "find %s/%s -name '*.conf' -prune | xargs cat | sed '/^\s*#/d;/^\s*$/d' | wc -l" % (p_path, p_pack)
+        cmd = "find %s/%s -name '*.conf' -prune -print0 | xargs -0 cat | sed '/^\s*#/d;/^\s*$/d' | wc -l" % (p_path, p_pack)
         count = int(os.popen(cmd).read())
-        cmd = "find %s/%s -name '*.app' -prune | xargs cat | sed '/^\s*#/d;/^\s*$/d' | wc -l" % (p_path, p_pack)
+        cmd = "find %s/%s -name '*.app' -prune -print0 | xargs -0 cat | sed '/^\s*#/d;/^\s*$/d' | wc -l" % (p_path, p_pack)
         count += int(os.popen(cmd).read())
-        cmd = "find %s/%s -name '*.rel' -prune | xargs cat | sed '/^\s*#/d;/^\s*$/d' | wc -l" % (p_path, p_pack)
+        cmd = "find %s/%s -name '*.rel' -prune -print0 | xargs -0 cat | sed '/^\s*#/d;/^\s*$/d' | wc -l" % (p_path, p_pack)
         count += int(os.popen(cmd).read())
-        cmd = "find %s/%s -name '*.properties' -prune | xargs cat | sed '/^\s*#/d;/^\s*$/d' | wc -l" % (p_path, p_pack)
+        cmd = "find %s/%s -name '*.properties' -prune -print0 | xargs -0 cat | sed '/^\s*#/d;/^\s*$/d' | wc -l" % (p_path, p_pack)
         count += int(os.popen(cmd).read())
-        cmd = "find %s/%s -name '*.xml' -prune | xargs cat | sed '/^\s*#/d;/^\s*$/d' | wc -l" % (p_path, p_pack)
+        cmd = "find %s/%s -name '*.xml' -prune -print0 | xargs -0 cat | sed '/^\s*#/d;/^\s*$/d' | wc -l" % (p_path, p_pack)
         count += int(os.popen(cmd).read())
-        cmd = "find %s/%s -name '*.sh' -prune | xargs cat | sed '/^\s*#/d;/^\s*$/d' | wc -l" % (p_path, p_pack)
+        cmd = "find %s/%s -name '*.sh' -prune -print0 | xargs -0 cat | sed '/^\s*#/d;/^\s*$/d' | wc -l" % (p_path, p_pack)
         count += int(os.popen(cmd).read())
-        cmd = "find %s/%s -name '*.json' -prune | xargs cat | sed '/^\s*\/\//d;/^\s*$/d' | wc -l" % (p_path, p_pack)
+        cmd = "find %s/%s -name '*.json' -prune -print0 | xargs -0 cat | sed '/^\s*\/\//d;/^\s*$/d' | wc -l" % (p_path, p_pack)
         count += int(os.popen(cmd).read())
-        cmd = "find %s/%s -name '*.yml' -prune | xargs cat | sed '/^\s*#/d;/^\s*$/d' | wc -l" % (p_path, p_pack)
+        cmd = "find %s/%s -name '*.yml' -prune -print0 | xargs -0 cat | sed '/^\s*#/d;/^\s*$/d' | wc -l" % (p_path, p_pack)
         count += int(os.popen(cmd).read())
         for counter in p_counters:
-            add_to_metrics(metrics, p_pack, MT_SLOC, counter, M_CONF_LOC, count)
+            add_to_metrics(metrics, p_path, p_pack, MT_SLOC, counter, M_CONF_LOC, count)
         count_by_name(metrics, pack, ['conf','app','rel','properties','xml','sh','json','yml'], M_PY_LOC)
 
     if M_PROTO_LOC in p_metricprocs:
-        cmd = "find %s/%s -name '*.proto' -prune | xargs cat | sed '/^\s*\/\//d;/^\s*$/d' | wc -l" % (p_path, p_pack)
+        cmd = "find %s/%s -name '*.proto' -prune -print0 | xargs -0 cat | sed '/^\s*\/\//d;/^\s*$/d' | wc -l" % (p_path, p_pack)
         count = int(os.popen(cmd).read())
         for counter in p_counters:
-            add_to_metrics(metrics, p_pack, MT_SLOC, counter, M_PROTO_LOC, count)
+            add_to_metrics(metrics, p_path, p_pack, MT_SLOC, counter, M_PROTO_LOC, count)
         count_by_name(metrics, pack, ['proto'], M_PY_LOC)
 
     if M_WEB_LOC in p_metricprocs:
-        cmd = "find %s/%s -name '*.gsp' -prune | xargs cat | sed '/^\s*\/\//d;/^\s*$/d' | wc -l" % (p_path, p_pack)
+        cmd = "find %s/%s -name '*.gsp' -prune -print0 | xargs -0 cat | sed '/^\s*\/\//d;/^\s*$/d' | wc -l" % (p_path, p_pack)
         count = int(os.popen(cmd).read())
-        cmd = "find %s/%s -name '*.html' -prune | xargs cat | sed '/^\s*\/\//d;/^\s*$/d' | wc -l" % (p_path, p_pack)
+        cmd = "find %s/%s -name '*.html' -prune -print0 | xargs -0 cat | sed '/^\s*\/\//d;/^\s*$/d' | wc -l" % (p_path, p_pack)
         count += int(os.popen(cmd).read())
-        #cmd = "find %s/%s -name '*.js' -prune | xargs cat | sed '/^\s*\/\//d;/^\s*$/d' | wc -l" % (p_path, p_pack)
+        #cmd = "find %s/%s -name '*.js' -prune -print0 | xargs -0 cat | sed '/^\s*\/\//d;/^\s*$/d' | wc -l" % (p_path, p_pack)
         #count += int(os.popen(cmd).read())
         for counter in p_counters:
-            add_to_metrics(metrics, p_pack, MT_SLOC, counter, M_WEB_LOC, count)
+            add_to_metrics(metrics, p_path, p_pack, MT_SLOC, counter, M_WEB_LOC, count)
         count_by_name(metrics, pack, ['gsp','html'], M_PY_LOC)
 
     if M_JS_LOC in p_metricprocs:
-        cmd = "find %s/%s -name '*.js' -prune | xargs cat | sed '/^\s*\/\//d;/^\s*$/d' | wc -l" % (p_path, p_pack)
+        cmd = "find %s/%s -name '*.js' -prune -print0 | xargs -0 cat | sed '/^\s*\/\//d;/^\s*$/d' | wc -l" % (p_path, p_pack)
         count = int(os.popen(cmd).read())
         for counter in p_counters:
-            add_to_metrics(metrics, p_pack, MT_SLOC, counter, M_JS_LOC, count)
+            add_to_metrics(metrics, p_path, p_pack, MT_SLOC, counter, M_JS_LOC, count)
         count_by_name(metrics, pack, ['js'], M_PY_LOC)
 
 def write_csv(metrics, unique):
@@ -308,6 +323,12 @@ def main_collect(packages):
 
     for entry in packages:
         measure_package(metrics, entry)
+
+    print "Scanned packages:"
+    for p in sorted(paths):
+        if p.startswith("../"):
+            p = p[3:]
+            print " ", p
 
     print "Metrics results:"
     pprint.pprint(metrics)
